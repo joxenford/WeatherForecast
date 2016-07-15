@@ -11,7 +11,18 @@
     tools:context="com.thinkupllc.weatherforecast.MainActivity">
 
     <TextView
+        android:id="@+id/forecastTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"/>
+        android:text="@string/app_name"
+        android:textSize="20sp" />
+
+    <ProgressBar
+        android:id="@+id/forecastProgress"
+        style="@android:style/Widget.ProgressBar.Small.Inverse"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center">
+    </ProgressBar>
+
 </RelativeLayout>

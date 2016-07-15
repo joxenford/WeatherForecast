@@ -2,42 +2,46 @@ package com.thinkupllc.weatherforecast;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
-import org.jdeferred.DoneCallback;
-import org.jdeferred.FailCallback;
-import org.jdeferred.Promise;
-
-import static java.lang.System.out;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
-    Promise<Weather, String, String> weather;
-    CoreFactory coreFactory = new CoreFactoryProd();
+    private static final String TAG = "MainActivity";
 
-    final ForecastParserInterface forecastParserInterface = coreFactory.forecastParser();
-    final ForecastEndpointInterface forecastEndpointInterface = coreFactory.endpoint();
-    final String forecastURL = forecastEndpointInterface.forecastEndpoint();
-
+    private TextView mForecastTextView;
+    private ProgressBar mSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        weather = forecastParserInterface.getForecast(forecastURL);
+        mForecastTextView = (TextView) findViewById(R.id.forecastTextView);
+        mSpinner = (ProgressBar) findViewById(R.id.forecastProgress);
 
-        weather.done(new DoneCallback<Weather>() {
-            public void onDone(Weather weather) {
-                out.print(weather);
-            }
-        });
-        weather.fail(new FailCallback() {
-            public void onFail(Object rejection) {
-                out.print(rejection);
-            }
-        });
+        getForcast();
+    }
 
+    private void getForcast() {
+        DarkSkyAPI.Factory.getInstance().getWeather().enqueue(new Callback<Weather>() {
+           @Override
+           public void onResponse(Call<Weather> call, Response<Weather> response) {
+               Log.d(TAG, response.body().toString());
+               mSpinner.setVisibility(View.GONE);
+               mForecastTextView.setText(response.body().toString());
+           }
 
-        System.out.print(weather);
+           @Override
+           public void onFailure(Call<Weather> call, Throwable t) {
+               Log.d(TAG, t.toString());
+           }
+       });
     }
 }
